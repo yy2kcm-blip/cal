@@ -5,6 +5,7 @@ import { Machine } from './js/machine.js';
 import { mountFaceplate } from './faceplate.js';
 import { setupPublicStudio } from './studio-ui.js';
 import {setupProgramLibrary} from './program-library.js';
+import { setupTeachMode } from './js/teach.js';
 
 const STORAGE_KEY = 'fx50-public-programs-v1';
 const machine = new Machine();
@@ -13,6 +14,8 @@ const canvas = document.getElementById('lcd');
 const accessibleDisplay = document.getElementById('lcd-accessible');
 const status = document.getElementById('status');
 const lcd = new LCD(canvas);
+// 外殼放大/縮小時 LCD 的 backing store 會跟著變，需要重繪
+lcd.onresize = () => { dirty = true; };
 
 let savedSlots = '';
 try {
@@ -42,6 +45,8 @@ function persistPrograms() {
 
 const faceplate = mountFaceplate(shell, KEYS);
 const buttons = faceplate.buttons;
+// 老師模式（投影教學輔助層）。預設關閉，?teach 或按 Alt+T 開啟。
+let teach = null;
 
 let blink = true;
 let lastNoticeId = 0;
@@ -57,6 +62,7 @@ function tap(id) {
     setTimeout(() => button.classList.remove('is-down'), 95);
   }
   machine.press(id);
+  if (teach) teach.onKey(id);
   persistPrograms();
   blink = true;
   lastBlink = performance.now();
@@ -120,3 +126,8 @@ requestAnimationFrame(frame);
 const studio = setupPublicStudio(machine, () => { dirty = true; blink = true; persistPrograms(); }, persistPrograms);
 
 setupProgramLibrary(machine,()=>{dirty=true;blink=true;},persistPrograms,studio);
+
+teach = setupTeachMode(machine, shell);
+const q = new URLSearchParams(location.search);
+if (q.has('teach')) teach.enable();
+if (q.has('wide')) { document.querySelector('.page')?.classList.add('wide'); }

@@ -52,13 +52,28 @@ export class LCD {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.dpr = Math.min(3, window.devicePixelRatio || 1);
+    // 顯示倍率：螢幕上實際顯示的寬度 / 設計寬度(GLASS.w)
+    this.scale = 1;
+    this.onresize = null;
     this.resize();
+    // 外殼放大時 canvas 的 CSS 尺寸會變， backing store 要跟著放大，
+    // 否則 LCD 會變糊（原本固定 588x245，放大後只是把點陣圖拉大）。
+    if (typeof ResizeObserver !== 'undefined') {
+      this.observer = new ResizeObserver(() => {
+        this.resize();
+        if (this.onresize) this.onresize();
+      });
+      this.observer.observe(canvas);
+    }
   }
 
   resize() {
     const { canvas } = this;
-    canvas.width = Math.round(GLASS.w * this.dpr);
-    canvas.height = Math.round(GLASS.h * this.dpr);
+    // 以實際顯示寬度為準，維持 588:245 的比例
+    const dispW = canvas.clientWidth || GLASS.w;
+    canvas.width = Math.max(1, Math.round(dispW * this.dpr));
+    canvas.height = Math.max(1, Math.round(dispW * this.dpr * GLASS.h / GLASS.w));
+    this.scale = dispW / GLASS.w;
   }
 
   /**
@@ -74,7 +89,7 @@ export class LCD {
    */
   render(v) {
     const c = this.ctx;
-    c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    c.setTransform(this.dpr * this.scale, 0, 0, this.dpr * this.scale, 0, 0);
     const grad = c.createLinearGradient(0, 0, 0, GLASS.h);
     grad.addColorStop(0, BG0);
     grad.addColorStop(1, BG1);

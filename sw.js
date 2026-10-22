@@ -1,9 +1,11 @@
 // sw.js — CalcX 离线版：预缓存全部静态资源，断网后照常使用。
-const CACHE = 'calcx-offline-v1';
+// 快取名由內容雜湊決定：內容一改，這個檔案的位元組就會變，瀏覽器會自動更新。
+const CACHE = 'calcx-offline-467f2b5dbe';
 const ASSETS = [
   "./",
   "./LICENSE",
   "./NOTICE.txt",
+  "./_diagnose.html",
   "./app.js",
   "./assets/fx-50fh-ii-generated-transparent.png",
   "./faceplate.js",
@@ -24,13 +26,15 @@ const ASSETS = [
   "./js/program.js",
   "./js/stats.js",
   "./js/studio.js",
+  "./js/teach.js",
   "./js/token-byte-costs.js",
   "./js/tokens.js",
   "./manifest.webmanifest",
   "./program-library-catalog.js",
   "./program-library.js",
   "./studio-ui.js",
-  "./style.css"
+  "./style.css",
+  "./teach.js"
 ];
 
 self.addEventListener('install', (event) => {

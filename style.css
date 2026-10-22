@@ -33,8 +33,19 @@ dialog{width:min(700px,calc(100% - 32px));max-height:calc(var(--visual-height,10
 /* Public uses the same centered page shell as Private. */
 body{background:linear-gradient(#41443d09 1px,transparent 1px),linear-gradient(90deg,#41443d09 1px,transparent 1px),#e9eaec;background-size:24px 24px;}
 .page{min-height:100dvh;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));}
-.calculator{display:flex;flex-direction:column;align-items:center;width:min(398px,92vw,calc((100dvh - 112px)*881/1785));}
+.calculator{display:flex;flex-direction:column;align-items:center;width:min(560px,92vw,calc((100dvh - 112px)*881/1785));}
 .studio-open{display:flex;align-items:center;justify-content:center;width:min(100%,360px);min-height:46px;margin-top:10px;padding:10px 16px;border:1px solid #b8cfc5;border-radius:12px;background:#e5f3ed;color:#1f5c48;font-size:14px;font-weight:700;box-shadow:0 5px 18px #254c3a14;}
 .compact-help{width:100%;margin-top:12px;color:#5c6965;font-size:11px;line-height:1.7;}
 .compact-help summary{cursor:pointer;text-align:center;}
-@media(max-width:680px){.calculator{width:min(398px,calc(100vw - 32px));}}
+@media(max-width:680px){.calculator{width:min(560px,calc(100vw - 32px));}}
+
+
+/* ---- 寬屏（投影）佈局 ----
+   計算機吃滿視窗寬度。fx-50FH II 是 881:1785 的直立機身，
+   在 16:9 的投影螢幕上「塞滿寬度」必然會超出畫面高度，因此這個模式
+   允許垂直捲動：LCD 會變得很大（投影時同學看得清數字），
+   按鍵區則往下延伸，老師自己捲動操作。
+   .page.wide 由老師模式的「⤢ 寬屏」按鈕或網址參數 ?wide 切換。 */
+.page.wide{place-items:start center;align-items:start;padding-top:8px;}
+.page.wide .calculator{width:calc(100vw - 16px);max-width:none;}
+.page.wide .shell{box-shadow:0 20px 34px -15px #28394e5c;}
